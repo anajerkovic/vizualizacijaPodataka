@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <title>Z1-2</title>
+</head>
+<body>
+    <script>
+        const body = d3.select("body");
+        body.append("h1").text("Vizualizacija podataka LV1");
+
+        [1, 2].forEach(d => {
+            const div = body.append("div");
+            div.append("h2").text("Podnaslov " + d);
+            div.append("p").text("Tekst " + d + ".");
+        });
+
+        d3.selectAll("p").text("Ovo je novi statični sadržaj."); 
+        d3.selectAll("div").attr("id", (d, i) => "ID" + (i + 1)); 
+    </script>
+</body>
+</html>

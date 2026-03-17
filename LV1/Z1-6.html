@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <title>Z1-6</title>
+</head>
+<body>
+    <script>
+        const svg = d3.select("body").append("svg").attr("width", 600).attr("height", 400);
+
+        svg.append("rect").attr("width", 600).attr("height", 100).attr("y", 300).style("fill", "green");
+
+        svg.append("rect").attr("x", 150).attr("y", 200).attr("width", 200).attr("height", 150).style("fill", "brown"); 
+        
+        svg.append("polygon").attr("points", "150,200 350,200 250,100").style("fill", "darkred");
+
+        svg.append("rect").attr("x", 230).attr("y", 280).attr("width", 40).attr("height", 70).style("fill", "black");
+
+        svg.append("circle").attr("cx", 500).attr("cy", 70).attr("r", 40).style("fill", "yellow"); 
+
+        svg.append("ellipse").attr("cx", 100).attr("cy", 60).attr("rx", 50).attr("ry", 30).style("fill", "lightgray");
+    </script>
+</body>
+</html>

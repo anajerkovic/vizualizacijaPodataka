@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <title>Z1-3</title>
+</head>
+<body>
+    <script>
+        const data = d3.range(1, 11); 
+        const container = d3.select("body")
+            .selectAll("div")
+            .data(data)
+            .enter()
+            .append("div")
+            .attr("id", d => "ID" + d); 
+
+        container.append("h2").text(d => "Podnaslov " + d); 
+        container.append("p").text(d => "Tekst " + d + "."); 
+        </script>
+</body>
+</html>

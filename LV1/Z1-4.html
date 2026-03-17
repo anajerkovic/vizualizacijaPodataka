@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <title>Z1-4</title>
+</head>
+<body>
+    <script>
+        const svg = d3.select("body")
+            .append("svg")
+            .attr("width", 200)
+            .attr("height", 700);
+
+        svg.append("rect")
+            .attr("x", 10)
+            .attr("y", 10)
+            .attr("width", 100) 
+            .attr("height", 600) 
+            .style("fill", "yellow") 
+            .style("stroke", "black") 
+            .style("stroke-width", "5px") 
+            .style("fill-opacity", 0.5) 
+            .style("stroke-opacity", 1.0); 
+    </script>
+</body>
+</html>
