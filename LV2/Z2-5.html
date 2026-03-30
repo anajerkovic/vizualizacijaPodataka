@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="hr">
+<head>
+  <meta charset="utf-8">
+  <title>Zadatak 5: Višestruki linijski graf</title>
+  <style>
+    .axis { font: 10px sans-serif; }
+    .axis path, .axis line { fill: none; stroke: #000; shape-rendering: crispEdges; }
+    .line { fill: none; stroke-width: 2px; }
+  </style>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+  <script>
+    // Tri skupa podataka
+    var data1 = [1, 3, 5, 4, 7, 8, 6, 9, 10, 12];
+    var data2 = [3, 2, 6, 5, 9, 7, 11, 8, 12, 14];
+    var data3 = [5, 4, 2, 7, 5, 10, 8, 13, 11, 15];
+
+    var margin = { top: 30, bottom: 50, left: 50, right: 20 };
+    var width = 600 - margin.left - margin.right;
+    var height = 400 - margin.top - margin.bottom;
+
+    var x = d3.scaleLinear().domain([0, data1.length - 1]).range([0, width]);
+    // Tražimo maksimum iz sva tri niza za Y domenu
+    var maxVal = d3.max([d3.max(data1), d3.max(data2), d3.max(data3)]);
+    var y = d3.scaleLinear().domain([0, maxVal]).range([height, 0]);
+
+    var svg = d3.select("body").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.bottom + margin.top)
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
+
+    svg.append("g").call(d3.axisLeft(y));
+
+    // Generator linije
+    var valueline = d3.line()
+      .x(function(d, i) { return x(i); })
+      .y(function(d) { return y(d); });
+
+    // Crtanje prve linije
+    svg.append("path")
+      .attr("class", "line")
+      .attr("d", valueline(data1))
+      .style("stroke", "red");
+
+    // Crtanje druge linije
+    svg.append("path")
+      .attr("class", "line")
+      .attr("d", valueline(data2))
+      .style("stroke", "blue");
+
+    // Crtanje treće linije
+    svg.append("path")
+      .attr("class", "line")
+      .attr("d", valueline(data3))
+      .style("stroke", "green");
+
+  </script>
+</body>
+</html>

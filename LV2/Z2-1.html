@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="hr">
+<head>
+  <meta charset="utf-8">
+  <title>Zadatci 1-4: Stupčasti graf</title>
+  <style>
+    .axis { font: 10px sans-serif; }
+    .axis path, .axis line { fill: none; stroke: #000; shape-rendering: crispEdges; }
+    .label { font-size: 12px; font-weight: bold; }
+  </style>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+  <script>
+    // ZADATAK 1: Odabrani i prilagođeni podatci (npr. broj studenata po godinama)
+    var podaci = [
+      { "godina": "2014", "broj": 1500 },
+      { "godina": "2015", "broj": 1620 },
+      { "godina": "2016", "broj": 1750 },
+      { "godina": "2017", "broj": 1680 },
+      { "godina": "2018", "broj": 1800 },
+      { "godina": "2019", "broj": 1950 },
+      { "godina": "2020", "broj": 2100 },
+      { "godina": "2021", "broj": 2050 },
+      { "godina": "2022", "broj": 2200 },
+      { "godina": "2023", "broj": 2350 }
+    ];
+
+    var margin = { top: 40, bottom: 70, left: 60, right: 20 };
+    var width = 600 - margin.left - margin.right;
+    var height = 500 - margin.top - margin.bottom;
+
+    // ZADATAK 4: Vlastita ordinalna skala s 10 boja
+    var boje = d3.scaleOrdinal()
+      .domain(d3.range(10))
+      .range(["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"]);
+
+    // Skale za X i Y (prilagođene za objekte)
+    var x = d3.scaleBand()
+      .domain(podaci.map(function(d) { return d.godina; }))
+      .range([0, width])
+      .padding(0.1);
+
+    var y = d3.scaleLinear()
+      .domain([0, d3.max(podaci, function(d) { return d.broj; })])
+      .range([height, 0]);
+
+    var svg = d3.select("body").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.bottom + margin.top)
+      .style("background-color", "#f4f4f4")
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var xAxis = d3.axisBottom(x);
+    var yAxis = d3.axisLeft(y).ticks(10);
+
+    // ZADATAK 3: Dodavanje osi i njihovih naziva
+    // X os
+    svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+      
+    // Naziv X osi
+    svg.append("text")
+      .attr("class", "label")
+      .attr("x", width / 2)
+      .attr("y", height + 40)
+      .style("text-anchor", "middle")
+      .text("Akademska godina");
+
+    // Y os
+    svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis);
+      
+    // Naziv Y osi
+    svg.append("text")
+      .attr("class", "label")
+      .attr("transform", "rotate(-90)")
+      .attr("x", -height / 2)
+      .attr("y", -45)
+      .style("text-anchor", "middle")
+      .text("Broj upisanih studenata");
+
+    // ZADATAK 2 i 4: Iscrtavanje stupaca i bojanje
+    svg.selectAll("rect")
+      .data(podaci)
+      .enter()
+      .append("rect")
+      .attr("x", function(d) { return x(d.godina); })
+      .attr("y", function(d) { return y(d.broj); })
+      .attr("width", x.bandwidth())
+      .attr("height", function(d) { return height - y(d.broj); })
+      .attr("fill", function(d, i) { return boje(i); }); 
+
+  </script>
+</body>
+</html>
