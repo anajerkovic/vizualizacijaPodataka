@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <title>Zadatak 4</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <svg width="600" height="400" style="border: 1px solid black;"></svg>
+    <script>
+        const svg = d3.select("svg");
+        const r = 20; // Radijus kružnica
+        const yPod = 350; // Položaj "tla"
+
+        // Umetanje pravokutnika (materijali pri dnu)
+        // 1. Kruta tvar
+        svg.append("rect").attr("x", 50).attr("y", yPod).attr("width", 100).attr("height", 50).style("fill", "#555");
+        // 2. Elastična tvar
+        svg.append("rect").attr("x", 250).attr("y", yPod).attr("width", 100).attr("height", 50).style("fill", "#8BC34A");
+        // 3. Tekućina
+        svg.append("rect").attr("x", 450).attr("y", yPod).attr("width", 100).attr("height", 50).style("fill", "#03A9F4");
+
+        // Kruta tvar: Sudar je trenutačan, nema odbijanja
+        svg.append("circle").attr("cx", 100).attr("cy", 30).attr("r", r).style("fill", "red")
+            .transition()
+            .duration(1500)
+            .ease(d3.easeQuadIn) // Ubrzanje pri padu
+            .attr("cy", yPod - r);
+
+        // Elastična tvar: Kugla se odbija
+        svg.append("circle").attr("cx", 300).attr("cy", 30).attr("r", r).style("fill", "red")
+            .transition()
+            .duration(2500)
+            .ease(d3.easeBounce) // Simulacija elastičnog odbijanja
+            .attr("cy", yPod - r);
+
+        // Tekućina: Kugla udara u površinu, usporava i polako tone u tekućinu
+        svg.append("circle").attr("cx", 500).attr("cy", 30).attr("r", r).style("fill", "red")
+            .transition()
+            .duration(1500)
+            .ease(d3.easeQuadIn)
+            .attr("cy", yPod - r)
+            .transition() // Tone dalje u tekućinu
+            .duration(3000)
+            .ease(d3.easeLinear)
+            .attr("cy", yPod + 25);
+    </script>
+</body>
+</html>

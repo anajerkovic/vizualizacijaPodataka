@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <title>Zadatak 1</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <svg width="400" height="400" style="border: 1px solid black;"></svg>
+    <script>
+        const svg = d3.select("svg");
+        const widthSVG = +svg.attr("width");
+        
+        svg.append("rect")
+            .attr("x", 50)
+            .attr("y", 50)
+            .attr("width", 50)
+            .attr("height", 50)
+            .style("fill", "none") // Bez ispune
+            .style("stroke", "blue") // Obrub u boji
+            .style("stroke-width", 2)
+            .transition()
+            .delay(3000) // Čekanje 3s
+            .duration(5000) // Dodavanje ispune tijekom 5s
+            .style("fill", "red")
+            .transition() // Nova tranzicija
+            .duration(2000)
+            .attr("width", widthSVG / 2) // Povećavanje stranice
+            .attr("height", widthSVG / 2)
+            .style("opacity", 0); // Smanjenje opacity na 0
+    </script>
+</body>
+</html>

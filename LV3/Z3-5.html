@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <title>Zadatak 5</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <svg width="600" height="600" style="border: 1px solid black; background: #111;"></svg>
+    <script>
+        const svg = d3.select("svg");
+        const cx = 300;
+        const cy = 300;
+
+        // Podaci o planetima: Ime, udaljenost (R), polumjer (r), brzina, boja
+        const planeti = [
+            { R: 70, r: 6, brzina: 0.08, boja: "gray" },     // Merkur
+            { R: 120, r: 10, brzina: 0.03, boja: "orange" }, // Venera
+            { R: 180, r: 12, brzina: 0.02, boja: "dodgerblue" }, // Zemlja
+            { R: 240, r: 9, brzina: 0.01, boja: "red" }      // Mars
+        ];
+
+        // Centralni kontejner pomaknut na sredinu SVG-a
+        const sustav = svg.append("g")
+            .attr("transform", `translate(${cx}, ${cy})`);
+
+        // Crtanje orbita (putanja)
+        sustav.selectAll(".orbita")
+            .data(planeti)
+            .enter()
+            .append("circle")
+            .attr("class", "orbita")
+            .attr("r", d => d.R)
+            .style("fill", "none")
+            .style("stroke", "#444")
+            .style("stroke-dasharray", "3,3");
+
+        // Crtanje Sunca u sredini
+        sustav.append("circle")
+            .attr("r", 35)
+            .style("fill", "yellow");
+
+        // Kreiranje grupa za svaki planet koje će se rotirati
+        const planetiGrupe = sustav.selectAll(".planet-grupa")
+            .data(planeti)
+            .enter()
+            .append("g");
+
+        // Umetanje planeta unutar rotirajućih grupa na zadanu udaljenost (R)
+        planetiGrupe.append("circle")
+            .attr("cx", d => d.R)
+            .attr("cy", 0)
+            .attr("r", d => d.r)
+            .style("fill", d => d.boja);
+
+        // Pokretanje simulacije orbita
+        d3.timer(function(elapsed) {
+            planetiGrupe.attr("transform", d => `rotate(${elapsed * d.brzina})`);
+        });
+    </script>
+</body>
+</html>

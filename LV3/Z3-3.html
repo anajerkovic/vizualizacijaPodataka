@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <title>Zadatak 3</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <svg width="400" height="400" style="border: 1px solid black;"></svg>
+    <script>
+        const svg = d3.select("svg");
+        const widthSVG = +svg.attr("width");
+        const heightSVG = +svg.attr("height");
+        const widthRect = 60, heightRect = 60;
+
+        // Početni položaj transformacije
+        const startX = widthSVG - widthRect;
+        const startY = heightSVG - heightRect;
+
+        svg.append("rect")
+            .attr("width", widthRect)
+            .attr("height", heightRect)
+            .style("fill", "purple")
+            .attr("transform", `translate(${startX}, ${startY})`)
+            .transition()
+            .duration(1000) // Prvo po x osi
+            .attr("transform", `translate(0, ${startY})`)
+            .transition() // Potom po y osi
+            .duration(1000)
+            .attr("transform", "translate(0, 0)");
+    </script>
+</body>
+</html>
