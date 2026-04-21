@@ -14,28 +14,28 @@
 
         // Umetanje pravokutnika (materijali pri dnu)
         // 1. Kruta tvar
-        svg.append("rect").attr("x", 50).attr("y", yPod).attr("width", 100).attr("height", 50).style("fill", "#555");
+        svg.append("rect").attr("x", 50).attr("y", yPod).attr("width", 100).attr("height", 50).style("fill", "#E54F6D");
         // 2. Elastična tvar
-        svg.append("rect").attr("x", 250).attr("y", yPod).attr("width", 100).attr("height", 50).style("fill", "#8BC34A");
+        svg.append("rect").attr("x", 250).attr("y", yPod).attr("width", 100).attr("height", 50).style("fill", "#E54F6D");
         // 3. Tekućina
-        svg.append("rect").attr("x", 450).attr("y", yPod).attr("width", 100).attr("height", 50).style("fill", "#03A9F4");
+        svg.append("rect").attr("x", 450).attr("y", yPod).attr("width", 100).attr("height", 50).style("fill", "#E54F6D");
 
         // Kruta tvar: Sudar je trenutačan, nema odbijanja
-        svg.append("circle").attr("cx", 100).attr("cy", 30).attr("r", r).style("fill", "red")
+        svg.append("circle").attr("cx", 100).attr("cy", 30).attr("r", r).style("fill", "#22162B")
             .transition()
             .duration(1500)
             .ease(d3.easeQuadIn) // Ubrzanje pri padu
             .attr("cy", yPod - r);
 
         // Elastična tvar: Kugla se odbija
-        svg.append("circle").attr("cx", 300).attr("cy", 30).attr("r", r).style("fill", "red")
+        svg.append("circle").attr("cx", 300).attr("cy", 30).attr("r", r).style("fill", "#22162B")
             .transition()
             .duration(2500)
             .ease(d3.easeBounce) // Simulacija elastičnog odbijanja
             .attr("cy", yPod - r);
 
         // Tekućina: Kugla udara u površinu, usporava i polako tone u tekućinu
-        svg.append("circle").attr("cx", 500).attr("cy", 30).attr("r", r).style("fill", "red")
+        svg.append("circle").attr("cx", 500).attr("cy", 30).attr("r", r).style("fill", "#22162B")
             .transition()
             .duration(1500)
             .ease(d3.easeQuadIn)
