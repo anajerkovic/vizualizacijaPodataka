@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <title>Z4-1 – Kružni prikaz voća</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <style>
+    body { margin: 0; display: flex; flex-direction: column; align-items: center;
+           justify-content: center; min-height: 100vh;
+           background: #f8f5f0; font-family: Georgia, serif; }
+    h1 { font-size: 1.3rem; color: #4a3728; letter-spacing: 1px; margin-bottom: 0; }
+    svg { margin-top: 10px; }
+    .slice path { stroke: #fff; stroke-width: 2; }
+    .label-name { font-size: 13px; font-weight: bold; fill: #3a2a1a; }
+    .label-qty  { font-size: 12px; fill: #7a5c3a; }
+  </style>
+</head>
+<body>
+<h1>Količina voća</h1>
+<svg id="chart"></svg>
+<script>
+  const data = [
+    { voce: "Jabuka",   kolicina: 30 },
+    { voce: "Kruška",   kolicina: 20 },
+    { voce: "Banana",   kolicina: 15 },
+    { voce: "Naranča",  kolicina: 25 },
+    { voce: "Grožđe",   kolicina: 10 },
+  ];
+
+  const width = 500, height = 400, radius = 150;
+  const color = d3.scaleOrdinal(["#e07b54","#f0c040","#78c47a","#5bafd6","#b47eb3"]);
+
+  const svg = d3.select("#chart")
+    .attr("width", width).attr("height", height)
+    .append("g")
+    .attr("transform", `translate(${width/2},${height/2})`);
+
+  const pie  = d3.pie().value(d => d.kolicina).sort(null);
+  const arc  = d3.arc().innerRadius(0).outerRadius(radius);
+  const arcL = d3.arc().innerRadius(radius + 20).outerRadius(radius + 20);
+
+  const slices = svg.selectAll(".slice")
+    .data(pie(data)).enter().append("g").attr("class","slice");
+
+  slices.append("path")
+    .attr("d", arc)
+    .attr("fill", d => color(d.data.voce));
+
+  // Naziv voća
+  slices.append("text").attr("class","label-name")
+    .attr("transform", d => `translate(${arcL.centroid(d)})`)
+    .attr("text-anchor","middle")
+    .attr("dy","-0.3em")
+    .text(d => d.data.voce);
+
+  // Količina
+  slices.append("text").attr("class","label-qty")
+    .attr("transform", d => `translate(${arcL.centroid(d)})`)
+    .attr("text-anchor","middle")
+    .attr("dy","1em")
+    .text(d => d.data.kolicina + " kom");
+</script>
+</body>
+</html>

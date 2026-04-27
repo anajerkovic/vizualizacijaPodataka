@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <title>Z4-2 – Ispravak preklapanja teksta</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <style>
+    body { margin: 0; display: flex; flex-direction: column; align-items: center;
+           justify-content: center; min-height: 100vh;
+           background: #f8f5f0; font-family: Georgia, serif; }
+    h1 { font-size: 1.2rem; color: #4a3728; margin-bottom: 4px; }
+    .subtitle { font-size: 0.85rem; color: #7a5c3a; margin-bottom: 4px; }
+    .charts { display: flex; gap: 40px; align-items: flex-start; }
+    .chart-wrap { display: flex; flex-direction: column; align-items: center; }
+    .chart-title { font-size: 0.9rem; font-weight: bold; color: #3a2a1a; margin-bottom: 4px; }
+    .slice path { stroke: #fff; stroke-width: 2; }
+    .label-name { font-size: 11px; font-weight: bold; fill: #3a2a1a; }
+    .label-qty  { font-size: 10px; fill: #7a5c3a; }
+  </style>
+</head>
+<body>
+<h1>Zadatak 2 – Ispravljanje preklapanja oznaka</h1>
+<p class="subtitle">Vrijednosti izmijenjene da provociraju preklapanje, zatim ispravak na dva načina</p>
+
+<div class="charts">
+  <!-- a) Tekstovi iznad kružnog prikaza -->
+  <div class="chart-wrap">
+    <div class="chart-title">a) Tekstovi iznad kružnog prikaza</div>
+    <svg id="chartA"></svg>
+  </div>
+  <!-- b) Rotirani tekst -->
+  <div class="chart-wrap">
+    <div class="chart-title">b) Rotirani tekst</div>
+    <svg id="chartB"></svg>
+  </div>
+</div>
+
+<script>
+  // Vrijednosti izmijenjene – mali segmenti provociraju preklapanje
+  const data = [
+    { voce: "Jabuka",   kolicina: 5  },
+    { voce: "Kruška",   kolicina: 4  },
+    { voce: "Banana",   kolicina: 6  },
+    { voce: "Naranča",  kolicina: 3  },
+    { voce: "Grožđe",   kolicina: 4  },
+    { voce: "Breskva",  kolicina: 5  },
+    { voce: "Šljiva",   kolicina: 3  },
+  ];
+
+  const color = d3.scaleOrdinal(["#e07b54","#f0c040","#78c47a","#5bafd6","#b47eb3","#e07b9e","#a0c47a"]);
+
+  function buildChart(svgId, rotateLabels) {
+    const width = 420, height = 420, radius = 110;
+    const svg = d3.select(svgId)
+      .attr("width", width).attr("height", height)
+      .append("g")
+      .attr("transform", `translate(${width/2},${height/2})`);
+
+    const pie  = d3.pie().value(d => d.kolicina).sort(null);
+    const arc  = d3.arc().innerRadius(0).outerRadius(radius);
+    // Labels placed further out to be "above" (higher z / further radius)
+    const arcL = d3.arc().innerRadius(radius + 30).outerRadius(radius + 30);
+
+    const slices = svg.selectAll(".slice")
+      .data(pie(data)).enter().append("g").attr("class","slice");
+
+    // Segmenti crtaju SE PRVI (ispod)
+    slices.append("path")
+      .attr("d", arc)
+      .attr("fill", d => color(d.data.voce));
+
+    // Tekstovi se dodaju NAKON segmenata – time su u DOM-u "iznad" (a)
+    const labels = slices.append("g")
+      .attr("transform", d => {
+        const [x, y] = arcL.centroid(d);
+        if (rotateLabels) {
+          // b) Rotacija prema kutu segmenta kako bi se smanjilo preklapanje
+          const midAngle = (d.startAngle + d.endAngle) / 2;
+          const deg = (midAngle * 180 / Math.PI) - 90;
+          return `translate(${x},${y}) rotate(${deg})`;
+        }
+        return `translate(${x},${y})`;
+      });
+
+    labels.append("text").attr("class","label-name")
+      .attr("text-anchor","middle")
+      .attr("dy","-0.3em")
+      .text(d => d.data.voce);
+
+    labels.append("text").attr("class","label-qty")
+      .attr("text-anchor","middle")
+      .attr("dy","1em")
+      .text(d => d.data.kolicina + " kom");
+  }
+
+  buildChart("#chartA", false); // a) iznad – bez rotacije
+  buildChart("#chartB", true);  // b) rotirani tekst
+</script>
+</body>
+</html>

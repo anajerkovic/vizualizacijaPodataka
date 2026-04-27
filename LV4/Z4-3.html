@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <title>Z4-3 – Događaji na segmentima</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <style>
+    body { margin: 0; display: flex; flex-direction: column; align-items: center;
+           justify-content: center; min-height: 100vh;
+           background: #f8f5f0; font-family: Georgia, serif; }
+    h1 { font-size: 1.2rem; color: #4a3728; margin-bottom: 2px; }
+    p.hint { font-size: 0.8rem; color: #9a7c5a; margin-bottom: 6px; }
+    .slice path { stroke: #fff; stroke-width: 2; cursor: pointer; transition: opacity .2s; }
+    .slice path:hover { opacity: 0.75; }
+    .label-name { font-size: 12px; font-weight: bold; fill: #3a2a1a; pointer-events: none; }
+    .label-qty  { font-size: 11px; fill: #7a5c3a; pointer-events: none; }
+
+    /* Vizualni log ispod grafa */
+    #log { margin-top: 16px; width: 440px; max-height: 160px; overflow-y: auto;
+           background: #2a1a0a; border-radius: 8px; padding: 10px 14px;
+           font-family: 'Courier New', monospace; font-size: 12px; color: #d4c09a; }
+    #log .entry { border-bottom: 1px solid #4a3a2a; padding: 4px 0; }
+    #log .entry span.key { color: #78c47a; }
+    #log .entry span.val { color: #f0c040; }
+  </style>
+</head>
+<body>
+<h1>Zadatak 3 – Klik na segment</h1>
+<p class="hint">Kliknite na segment → naziv i količina ispisuju se u konzoli i ispod grafa</p>
+<svg id="chart"></svg>
+<div id="log"><div style="color:#7a6a5a;font-size:11px">— čekam klik —</div></div>
+
+<script>
+  const data = [
+    { voce: "Jabuka",   kolicina: 30 },
+    { voce: "Kruška",   kolicina: 20 },
+    { voce: "Banana",   kolicina: 15 },
+    { voce: "Naranča",  kolicina: 25 },
+    { voce: "Grožđe",   kolicina: 10 },
+  ];
+
+  const width = 500, height = 400, radius = 150;
+  const color = d3.scaleOrdinal(["#e07b54","#f0c040","#78c47a","#5bafd6","#b47eb3"]);
+
+  const svg = d3.select("#chart")
+    .attr("width", width).attr("height", height)
+    .append("g")
+    .attr("transform", `translate(${width/2},${height/2})`);
+
+  const pie  = d3.pie().value(d => d.kolicina).sort(null);
+  const arc  = d3.arc().innerRadius(0).outerRadius(radius);
+  const arcL = d3.arc().innerRadius(radius + 25).outerRadius(radius + 25);
+
+  const slices = svg.selectAll(".slice")
+    .data(pie(data)).enter().append("g").attr("class","slice");
+
+  slices.append("path")
+    .attr("d", arc)
+    .attr("fill", d => color(d.data.voce))
+    // ── Registracija događaja ──────────────────────────────────
+    .on("click", function(event, d) {
+      // Ispis u konzolu (zadatak)
+      console.log(`Voće: ${d.data.voce}, Količina: ${d.data.kolicina}`);
+
+      // Vizualni log u stranici
+      const logEl = document.getElementById("log");
+      const entry = document.createElement("div");
+      entry.className = "entry";
+      entry.innerHTML = `<span class="key">voće:</span> <span class="val">${d.data.voce}</span>`
+                      + ` &nbsp;|&nbsp; <span class="key">količina:</span> <span class="val">${d.data.kolicina} kom</span>`;
+      logEl.prepend(entry);
+    })
+    .on("mouseover", function(event, d) {
+      d3.select(this).attr("opacity", 0.75);
+    })
+    .on("mouseout", function(event, d) {
+      d3.select(this).attr("opacity", 1);
+    });
+
+  slices.append("text").attr("class","label-name")
+    .attr("transform", d => `translate(${arcL.centroid(d)})`)
+    .attr("text-anchor","middle").attr("dy","-0.3em")
+    .text(d => d.data.voce);
+
+  slices.append("text").attr("class","label-qty")
+    .attr("transform", d => `translate(${arcL.centroid(d)})`)
+    .attr("text-anchor","middle").attr("dy","1em")
+    .text(d => d.data.kolicina + " kom");
+</script>
+</body>
+</html>

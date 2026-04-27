@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <title>Z4-4 – Stablo s mogućnošću skrivanja čvorova</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <style>
+    body { margin: 0; display: flex; flex-direction: column; align-items: center;
+           min-height: 100vh; background: #f8f5f0; font-family: Georgia, serif; padding: 20px 0; }
+    h1 { font-size: 1.2rem; color: #4a3728; margin-bottom: 2px; }
+    p.hint { font-size: 0.8rem; color: #9a7c5a; margin-bottom: 6px; }
+    svg { overflow: visible; }
+
+    .link { fill: none; stroke: #c4a882; stroke-width: 1.5px; }
+
+    .node circle {
+      fill: #fff;
+      stroke: #9a6a3a;
+      stroke-width: 2px;
+      cursor: pointer;
+      transition: fill .2s;
+      r: 8;
+    }
+    .node.collapsed circle { fill: #e07b54; }
+    .node.leaf circle { fill: #78c47a; cursor: default; stroke: #4a8a4a; }
+
+    .node text {
+      font-size: 12px;
+      fill: #3a2a1a;
+      font-family: Georgia, serif;
+      cursor: pointer;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+<h1>Zadatak 4 – Sklopivo stablo</h1>
+<p class="hint">Kliknite na čvor (naranča = srušen, zelena = list) za skrivanje/prikaz djece</p>
+<svg id="tree"></svg>
+
+<script>
+// ── Podaci ────────────────────────────────────────────────────────────────────
+const treeData = {
+  name: "Voće", children: [
+    { name: "Južno voće", children: [
+        { name: "Banana" },
+        { name: "Mango" },
+        { name: "Papaja" },
+    ]},
+    { name: "Umjereno voće", children: [
+        { name: "Jabuka", children: [
+            { name: "Zlatni delišes" },
+            { name: "Granny Smith" },
+        ]},
+        { name: "Kruška" },
+        { name: "Šljiva" },
+    ]},
+    { name: "Agrumi", children: [
+        { name: "Naranča" },
+        { name: "Limun" },
+        { name: "Grejpfrut" },
+    ]},
+  ]
+};
+
+// ── Dimenzije ─────────────────────────────────────────────────────────────────
+const margin = { top: 40, right: 120, bottom: 40, left: 80 };
+const width  = 780 - margin.left - margin.right;
+const height = 500 - margin.top  - margin.bottom;
+
+const svg = d3.select("#tree")
+  .attr("width",  width  + margin.left + margin.right)
+  .attr("height", height + margin.top  + margin.bottom)
+  .append("g")
+  .attr("transform", `translate(${margin.left},${margin.top})`);
+
+// Pohrana skrivene djece u _children
+const root = d3.hierarchy(treeData);
+root.x0 = height / 2;
+root.y0 = 0;
+
+// Pomaknemo sve razine za 180px po osi x
+const treeLayout = d3.tree().size([height, width]);
+
+// ── Ažuriranje stabla ─────────────────────────────────────────────────────────
+let nodeId = 0;
+
+function update(source) {
+  treeLayout(root);
+
+  const nodes = root.descendants();
+  const links = root.links();
+
+  // Fiksiramo razmak između razina
+  nodes.forEach(d => { d.y = d.depth * 180; });
+
+  // ── Čvorovi ──────────────────────────────────────────────────────────────
+  const node = svg.selectAll("g.node")
+    .data(nodes, d => d.id || (d.id = ++nodeId));
+
+  const nodeEnter = node.enter().append("g")
+    .attr("class", d => {
+      if (!d.children && !d._children) return "node leaf";
+      return d._children ? "node collapsed" : "node";
+    })
+    .attr("transform", `translate(${source.y0},${source.x0})`)
+    .on("click", click);
+
+  nodeEnter.append("circle");
+
+  nodeEnter.append("text")
+    .attr("x", d => (d.children || d._children) ? -14 : 14)
+    .attr("dy", "0.35em")
+    .attr("text-anchor", d => (d.children || d._children) ? "end" : "start")
+    .text(d => d.data.name);
+
+  // Tranzicija ulaza
+  const nodeUpdate = nodeEnter.merge(node)
+    .transition().duration(400)
+    .attr("transform", d => `translate(${d.y},${d.x})`)
+    .attr("class", d => {
+      if (!d.children && !d._children) return "node leaf";
+      return d._children ? "node collapsed" : "node";
+    });
+
+  // Izlaz
+  node.exit()
+    .transition().duration(400)
+    .attr("transform", `translate(${source.y},${source.x})`)
+    .remove();
+
+  // ── Veze ─────────────────────────────────────────────────────────────────
+  const link = svg.selectAll("path.link")
+    .data(links, d => d.target.id);
+
+  const diagonal = d3.linkHorizontal().x(d => d.y).y(d => d.x);
+
+  link.enter().insert("path","g")
+    .attr("class","link")
+    .attr("d", () => {
+      const o = { x: source.x0, y: source.y0 };
+      return diagonal({ source: o, target: o });
+    })
+    .merge(link)
+    .transition().duration(400)
+    .attr("d", diagonal);
+
+  link.exit()
+    .transition().duration(400)
+    .attr("d", () => {
+      const o = { x: source.x, y: source.y };
+      return diagonal({ source: o, target: o });
+    })
+    .remove();
+
+  // Spremi staru poziciju za tranziciju
+  nodes.forEach(d => { d.x0 = d.x; d.y0 = d.y; });
+}
+
+// ── Klik: sklopi / rasklopi ────────────────────────────────────────────────────
+function click(event, d) {
+  if (!d.children && !d._children) return; // list, nema djece
+  if (d.children) {
+    d._children = d.children;  // sakrij
+    d.children  = null;
+  } else {
+    d.children  = d._children; // prikaži
+    d._children = null;
+  }
+  update(d);
+}
+
+update(root);
+</script>
+</body>
+</html>
